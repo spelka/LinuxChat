@@ -17,6 +17,16 @@ void ConnectToServer(int port, QString ip, void *app)
     }
 
 
+    bzero((char *)&serv_addr, sizeof(struct sockaddr_in));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+    if ((hostPtr = gethostbyname(ip.toUtf8().constData())) == NULL)
+    {
+        qDebug() << "Unknown server address";
+        return;
+    }
+
+    bcopy(hostPtr->h_addr, (char *)&serv_addr.sin_addr, hostPtr->h_length);
 
 
 }
