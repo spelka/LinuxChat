@@ -13,11 +13,15 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListView>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -28,8 +32,13 @@ class Ui_Application
 public:
     QAction *actionConnect_to_server;
     QWidget *centralWidget;
+    QGridLayout *gridLayout_2;
+    QGridLayout *gridLayout;
+    QLineEdit *msgEdit;
+    QListView *clientList;
+    QPushButton *btnSend;
+    QTextBrowser *txtConvo;
     QMenuBar *menuBar;
-    QMenu *menuClient;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -37,17 +46,46 @@ public:
     {
         if (Application->objectName().isEmpty())
             Application->setObjectName(QStringLiteral("Application"));
-        Application->resize(539, 388);
+        Application->resize(845, 472);
         actionConnect_to_server = new QAction(Application);
         actionConnect_to_server->setObjectName(QStringLiteral("actionConnect_to_server"));
         centralWidget = new QWidget(Application);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        gridLayout_2 = new QGridLayout(centralWidget);
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout = new QGridLayout();
+        gridLayout->setSpacing(6);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        msgEdit = new QLineEdit(centralWidget);
+        msgEdit->setObjectName(QStringLiteral("msgEdit"));
+
+        gridLayout->addWidget(msgEdit, 1, 1, 1, 1);
+
+        clientList = new QListView(centralWidget);
+        clientList->setObjectName(QStringLiteral("clientList"));
+        clientList->setMaximumSize(QSize(250, 16777215));
+
+        gridLayout->addWidget(clientList, 0, 0, 1, 1);
+
+        btnSend = new QPushButton(centralWidget);
+        btnSend->setObjectName(QStringLiteral("btnSend"));
+
+        gridLayout->addWidget(btnSend, 1, 2, 1, 1);
+
+        txtConvo = new QTextBrowser(centralWidget);
+        txtConvo->setObjectName(QStringLiteral("txtConvo"));
+
+        gridLayout->addWidget(txtConvo, 0, 1, 1, 2);
+
+
+        gridLayout_2->addLayout(gridLayout, 0, 0, 1, 1);
+
         Application->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(Application);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 539, 30));
-        menuClient = new QMenu(menuBar);
-        menuClient->setObjectName(QStringLiteral("menuClient"));
+        menuBar->setGeometry(QRect(0, 0, 845, 30));
         Application->setMenuBar(menuBar);
         mainToolBar = new QToolBar(Application);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -56,8 +94,7 @@ public:
         statusBar->setObjectName(QStringLiteral("statusBar"));
         Application->setStatusBar(statusBar);
 
-        menuBar->addAction(menuClient->menuAction());
-        menuClient->addAction(actionConnect_to_server);
+        mainToolBar->addAction(actionConnect_to_server);
 
         retranslateUi(Application);
 
@@ -68,7 +105,7 @@ public:
     {
         Application->setWindowTitle(QApplication::translate("Application", "Application", 0));
         actionConnect_to_server->setText(QApplication::translate("Application", "Connect to server", 0));
-        menuClient->setTitle(QApplication::translate("Application", "Config", 0));
+        btnSend->setText(QApplication::translate("Application", "Send", 0));
     } // retranslateUi
 
 };

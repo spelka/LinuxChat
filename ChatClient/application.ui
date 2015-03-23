@@ -6,30 +6,53 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>388</height>
+    <width>845</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Application</string>
   </property>
-  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="msgEdit"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QListView" name="clientList">
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="btnSend">
+        <property name="text">
+         <string>Send</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QTextBrowser" name="txtConvo"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>539</width>
+     <width>845</width>
      <height>30</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuClient">
-    <property name="title">
-     <string>Config</string>
-    </property>
-    <addaction name="actionConnect_to_server"/>
-   </widget>
-   <addaction name="menuClient"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -38,6 +61,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionConnect_to_server"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionConnect_to_server">
