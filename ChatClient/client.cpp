@@ -28,5 +28,12 @@ void ConnectToServer(int port, QString ip, void *app)
 
     bcopy(hostPtr->h_addr, (char *)&serv_addr.sin_addr, hostPtr->h_length);
 
+    if (connect (clientSocket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
+    {
+        qDebug() << "Can't connect to server";
+        perror("connect");
+        return;
+    }
 
+    qDebug() << "Connected: Server Name: " << hostPtr->h_name;
 }
