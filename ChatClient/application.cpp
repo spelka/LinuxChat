@@ -11,7 +11,7 @@ Application::Application(QWidget *parent) :
 
     connect(this, SIGNAL(valueChangedConvo(QString)), ui->txtConvo, SLOT(append(QString)));
     connect(this, SIGNAL(valueChangedUsr(QString)), this, SLOT(addToList(QString)));
-    connect(this, SIGNAL(valueUsrRemoved(int)), this, SLOT(removeFromList(int)));
+    connect(this, SIGNAL(valueUsrRemoved(QString)), this, SLOT(removeFromList(QString)));
 }
 
 Application::~Application()
@@ -24,6 +24,7 @@ void Application::on_actionConnect_to_server_triggered()
 {
     QString port;
     QString host;
+    QString user;
     int portnum;
 
     Dialog configureDialog;
@@ -34,10 +35,15 @@ void Application::on_actionConnect_to_server_triggered()
     {
         port = configureDialog.getPort();
         host = configureDialog.getHost();
+        displayName = configureDialog.getDisplayName();
 
         portnum = atoi(port.toUtf8().constData());
 
         ConnectToServer(portnum, (char*)host.toUtf8().constData(), (void*) this);
+
+        user = QString("add: %1").arg(displayName);
+
+        SendMessage(user.toUtf8().constData(), user.size());
     }
 
 }
@@ -52,9 +58,9 @@ void Application::addUser(QString str)
     emit valueChangedUsr(str);
 }
 
-void Application::removeUser(int index)
+void Application::removeUser(QString usr)
 {
-    emit valueUsrRemoved(index);
+    emit valueUsrRemoved(usr);
 }
 
 /**
@@ -72,9 +78,12 @@ void Application::addToList(QString str)
  * @brief Application::removeFromList
  * @param index
  */
-void Application::removeFromList(int index)
+void Application::removeFromList(QString usr)
 {
-    usrList.remove(index);
+    if (usrList.contains(usr))
+    {
+        usrList.removeOne(usr);
+    }
 
     ui->listUsers->setModel(new QStringListModel(QList<QString>::fromVector(usrList)));
 }
@@ -82,8 +91,13 @@ void Application::removeFromList(int index)
 
 void Application::on_btnSend_clicked()
 {
-    QString text = ui->msgEdit->toPlainText();
+    QString text;
+
+    text = QString("usr:%1:%2").arg(displayName).arg(ui->msgEdit->toPlainText());
+
     int size = text.size();
+
+    appendMessage("Me: " + ui->msgEdit->toPlainText());
 
     SendMessage(text.toUtf8().constData(), size);
 }

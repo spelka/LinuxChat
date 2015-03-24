@@ -2,6 +2,7 @@
 #define CLIENT
 
 #define IP_LEN 16
+#define BUFFSIZE 1024
 
 #include <stdio.h>
 #include <netdb.h>
@@ -16,10 +17,12 @@
 #include <pthread.h>
 #include <QString>
 #include <QDebug>
+#include <QRegExp>
 
 void ConnectToServer(int port, char* ip, void *app);
 void CloseConnection();
 void SendMessage(const char*, int);
+void* readThrd(void *param);
 
 #endif // CLIENT
 

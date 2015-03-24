@@ -6,18 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>217</height>
+    <width>419</width>
+    <height>169</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="portEdit"/>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Host</string>
+     </property>
+    </widget>
    </item>
    <item row="3" column="1">
+    <widget class="QLineEdit" name="portEdit"/>
+   </item>
+   <item row="4" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -27,25 +34,33 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Port</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="1" column="1">
     <widget class="QLineEdit" name="hostEdit"/>
    </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="displayNameEdit"/>
+   </item>
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Host</string>
+      <string>Display Name</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>displayNameEdit</tabstop>
+  <tabstop>hostEdit</tabstop>
+  <tabstop>portEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -55,12 +70,12 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>278</x>
-     <y>164</y>
+     <x>375</x>
+     <y>152</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
-     <y>191</y>
+     <y>168</y>
     </hint>
    </hints>
   </connection>
@@ -71,12 +86,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>346</x>
-     <y>170</y>
+     <x>412</x>
+     <y>152</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
-     <y>191</y>
+     <y>168</y>
     </hint>
    </hints>
   </connection>

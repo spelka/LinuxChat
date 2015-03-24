@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -177,6 +178,7 @@ int processConnections()
 			
 		}
 
+
 		//check for any new data
 		for ( i = 0 ; i <= max_array_index ; i++ )
 		{
@@ -201,7 +203,13 @@ int processConnections()
 				{
 					std::cout << "Remote Address: " << inet_ntoa(client_address.sin_addr) << " closed connection" << std::endl;
 					close(sockFd);
+					FD_CLR(sockFd, &master_filedescriptors);
+					clients[i] = -1;
+
+					sprintf(read_buffer, "%s", "client disconnected");
 				}
+
+
 
 				//echo data to all connected clients
 				std::cout << "broadcasting message: " << read_buffer << std::endl;
@@ -214,6 +222,8 @@ int processConnections()
 					}
 				}
 
+				memset(read_buffer, 0, sizeof(read_buffer));
+
 				if (--num_ready_descriptors <= 0)
             			break;  
 			}
@@ -222,3 +232,4 @@ int processConnections()
 
 	return 0;
 }
+

@@ -74,12 +74,12 @@ static const uint qt_meta_data_Application[] = {
  // signals: parameters
     QMetaType::Void, QMetaType::QString,    2,
     QMetaType::Void, QMetaType::QString,    2,
-    QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void, QMetaType::QString,    2,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    2,
-    QMetaType::Void, QMetaType::Int,    2,
+    QMetaType::Void, QMetaType::QString,    2,
     QMetaType::Void,
 
        0        // eod
@@ -92,10 +92,10 @@ void Application::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         switch (_id) {
         case 0: _t->valueChangedConvo((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 1: _t->valueChangedUsr((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 2: _t->valueUsrRemoved((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 2: _t->valueUsrRemoved((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 3: _t->on_actionConnect_to_server_triggered(); break;
         case 4: _t->addToList((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 5: _t->removeFromList((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 5: _t->removeFromList((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 6: _t->on_btnSend_clicked(); break;
         default: ;
         }
@@ -115,7 +115,7 @@ void Application::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
             }
         }
         {
-            typedef void (Application::*_t)(int );
+            typedef void (Application::*_t)(QString );
             if (*reinterpret_cast<_t *>(func) == static_cast<_t>(&Application::valueUsrRemoved)) {
                 *result = 2;
             }
@@ -174,7 +174,7 @@ void Application::valueChangedUsr(QString _t1)
 }
 
 // SIGNAL 2
-void Application::valueUsrRemoved(int _t1)
+void Application::valueUsrRemoved(QString _t1)
 {
     void *_a[] = { Q_NULLPTR, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
