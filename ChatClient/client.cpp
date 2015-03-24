@@ -13,6 +13,7 @@ void ConnectToServer(int port, char *ip, void *app)
     struct sockaddr_in serv_addr;
     char **pptr;
     char serverAddress[IP_LEN];
+    pthread_t threadRead;
 
     mainWindow = (Application*) app;
 
@@ -50,6 +51,67 @@ void ConnectToServer(int port, char *ip, void *app)
             .arg(inet_ntop(hostPtr->h_addrtype, pptr, serverAddress, sizeof(serverAddress)));
     mainWindow->appendMessage(strInfo);
 
+    pthread_create (&threadRead, NULL, readThrd, (void*)clientSocket);
+    qDebug() << "Pthread created";
 
+}
+
+void* readThrd(void *param)
+{
+    char *bp, buf[BUFFSIZE];
+    int bytes_to_read, n;
+    char *tok;
+    tok = (char*)malloc(BUFFSIZE);
+
+    QRegExp rxUsrAdd("add: *");
+    QRegExp rxUsrRemove("remove: *");
+    QRegExp rxMsg("usr: *");
+
+    QString str;
+
+    int* passedSocket = (int *) param;
+
+    while(true)
+    {
+        bp = buf;
+        bytes_to_read = BUFFSIZE;    QRegExp rxUsrAdd("add: *");
+        n = recv(clientSocket, bp, bytes_to_read, 0);
+
+        if (rxUsrAdd.indexIn(buf) != -1)
+        {
+            tok = strtok(buf, ":");
+            tok = strtok(NULL, ":");
+            qDebug() << "User Arrived: " << tok;
+            str = tok;
+            mainWindow->addUser(str);
+        }
+        if (rxUsrRemove.indexIn(buf) != -1)
+        {
+
+        }
+        if (rxMsg.indexIn(buf) != -1)
+        {
+            tok = strtok(buf, ":");
+            tok = strtok(NULL, ":");
+            str = tok;
+            tok = strtok(NULL, ":");
+            str.append(": ");
+            str.append(tok);
+
+            mainWindow->appendMessage(str);
+        }
+
+        qDebug() << "Received: " << buf;
+    }
+
+}
+
+void SendMessage(const char* msg, int size)
+{
+    send (clientSocket, msg, size, 0);
+}
+
+void CloseConnection()
+{
     close(clientSocket);
 }

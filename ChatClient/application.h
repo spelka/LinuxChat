@@ -20,22 +20,25 @@ public:
     ~Application();
     void appendMessage(QString str);
     void addUser(QString str);
-    void removeUser(int);
+    void removeUser(QString);
 
 private slots:
     void on_actionConnect_to_server_triggered();
     void addToList(QString);
-    void removeFromList(int);
+    void removeFromList(QString);
+
+    void on_btnSend_clicked();
 
 private:
     Ui::Application *ui;
     QVector<QString> usrList;
+    QString displayName;
 
 
 signals:
     void valueChangedConvo(QString);
     void valueChangedUsr(QString);
-    void valueUsrRemoved(int);
+    void valueUsrRemoved(QString);
 };
 
 #endif // APPLICATION_H

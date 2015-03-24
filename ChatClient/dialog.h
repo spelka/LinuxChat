@@ -16,6 +16,7 @@ public:
     ~Dialog();
     QString getPort();
     QString getHost();
+    QString getDisplayName();
 
 private:
     Ui::Dialog *ui;

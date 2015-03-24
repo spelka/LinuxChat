@@ -7,7 +7,7 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->hostEdit->setFocus();
+    ui->displayNameEdit->setFocus();
 }
 
 Dialog::~Dialog()
@@ -23,4 +23,9 @@ QString Dialog::getPort()
 QString Dialog::getHost()
 {
     return ui->hostEdit->text();
+}
+
+QString Dialog::getDisplayName()
+{
+    return ui->displayNameEdit->text();
 }
