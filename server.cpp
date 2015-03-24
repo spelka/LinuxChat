@@ -6,6 +6,7 @@
 #include <strings.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <iostream>
 
 #define DEFAULT_PORT 7000
 #define MAX_CLIENTS 5
@@ -42,6 +43,7 @@ int main ()
 	if ( listen_socket == -1 )
 	{
 		//failed to create socket
+		std::cout << "ERROR: failed to create socket" << std::endl;
 		return 1;
 	}
 
@@ -51,6 +53,7 @@ int main ()
 	if ( retval == -1 )
 	{
 		//set socket option failure
+		std::cout << "ERROR: Socket option failure" << std::endl;
 		return 1;
 	}
 
@@ -65,6 +68,7 @@ int main ()
 	if ( retval == -1 )
 	{	
 		//bind failed
+		std::cout << "ERROR: Failed to bind socket" << std::endl;
 		return 1;
 	}
 
@@ -91,6 +95,7 @@ int main ()
 		if ( num_ready_descriptors == -1 )
 		{
 			//select failure
+			std::cout << "ERROR: Select call failed" << std::endl;
 			return 1;
 		}
 
@@ -103,44 +108,47 @@ int main ()
 			if ( client_socket == -1)
 			{
 				//failed to accept socket
+				std::cout << "ERROR: accept call failed" << std::endl;
+				continue;
 			}
+			
+			//message
+			std::cout << "New socket accepted" << std::endl;
 
 			//add the new socket to the file descriptor set
-			for ( i = 0 ; i < MAX_CLIENTS ; i++ )
+			for ( i = 0 ; i < FD_SETSIZE ; i++ )
 			{
 				if ( clients[i] < 0 )
 				{
 					//save the descriptor
 					clients[i] = client_socket;
-					break;
-				}
-			}
+					std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
 
-			if ( i == FD_SETSIZE )
-			{
-				//too many clients
-			}
-			else
-			{
-				//add the descriptor to the set
-				FD_SET ( client_socket, &master_filedescriptors );
+					//add the descriptor to the set
+					FD_SET ( client_socket, &master_filedescriptors );
 
-				if ( client_socket > max_filedescriptors )
-				{	
-					//update max_filedescriptors
-					max_filedescriptors = client_socket;
-				}
+					if ( client_socket > max_filedescriptors )
+					{	
+						//update max_filedescriptors
+						max_filedescriptors = client_socket;
+						std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
 
-				if ( i < max_array_index )
-				{
-					//update max index in array
-					max_array_index = i;
-				}
+					}
 
-				if ( --num_ready_descriptors <= 0 )
-				{
-					//no more descriptors ready
-					continue;
+					if ( i < max_array_index )
+					{
+						//update max index in array
+						max_array_index = i;
+						std::cout << "new max array index: " << max_array_index << std::endl;
+					}
+
+
+					if ( --num_ready_descriptors <= 0 )
+					{
+						//no more descriptors ready
+						std::cout << "no more descriptors available" << std::endl;
+						continue;
+					}
 				}
 			}
 		}
@@ -157,6 +165,7 @@ int main ()
 			//??
 			if ( FD_ISSET ( client_socket, &copy_filedescriptors ) )
 			{
+				std::cout << "file descriptor is set" << std::endl;
 				byte_pointer = read_buffer;
 				bytes_to_read = BUFFER_LENGTH;
 
@@ -170,6 +179,7 @@ int main ()
 				//echo data to all connected clients
 				for ( i = 0 ; i < clients[i] ; i++ )
 				{
+					std::cout << "broadcasting message: " << read_buffer << std::endl;
 					write ( clients[i], read_buffer, BUFFER_LENGTH );
 				}
 			}
