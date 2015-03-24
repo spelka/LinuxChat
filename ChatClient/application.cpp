@@ -6,6 +6,12 @@ Application::Application(QWidget *parent) :
     ui(new Ui::Application)
 {
     ui->setupUi(this);
+
+    ui->listUsers->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    connect(this, SIGNAL(valueChangedConvo(QString)), ui->txtConvo, SLOT(append(QString)));
+    connect(this, SIGNAL(valueChangedUsr(QString)), this, SLOT(addToList(QString)));
+    connect(this, SIGNAL(valueUsrRemoved(int)), this, SLOT(removeFromList(int)));
 }
 
 Application::~Application()
@@ -30,7 +36,45 @@ void Application::on_actionConnect_to_server_triggered()
 
         portnum = atoi(port.toUtf8().constData());
 
-        ConnectToServer(portnum, host, (void*) this);
+        ConnectToServer(portnum, (char*)host.toUtf8().constData(), (void*) this);
     }
 
 }
+
+void Application::appendMessage(QString str)
+{
+    emit valueChangedConvo(str);
+}
+
+void Application::addUser(QString str)
+{
+    emit valueChangedUsr(str);
+}
+
+void Application::removeUser(int index)
+{
+    emit valueUsrRemoved(index);
+}
+
+/**
+ * @brief Application::addToList
+ * @param str
+ */
+void Application::addToList(QString str)
+{
+    usrList.push_back(str);
+
+    ui->listUsers->setModel(new QStringListModel(QList<QString>::fromVector(usrList)));
+}
+
+/**
+ * @brief Application::removeFromList
+ * @param index
+ */
+void Application::removeFromList(int index)
+{
+    usrList.remove(index);
+
+    ui->listUsers->setModel(new QStringListModel(QList<QString>::fromVector(usrList)));
+}
+
