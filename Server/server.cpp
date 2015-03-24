@@ -12,29 +12,34 @@
 #define MAX_CLIENTS 5
 #define BUFFER_LENGTH 255
 
+//socket handling variables
+int listen_socket, client_socket;
+int retval;							//holds a return value for testing failures
+struct sockaddr_in listen_address, client_address;
+unsigned int client_address_size;
+
+
+// file descriptor handling variables
+int max_filedescriptors;			//the number of file descriptors used
+fd_set master_filedescriptors;		//the master set of file descriptors
+fd_set copy_filedescriptors;		//holds a copy of the master set
+int clients[MAX_CLIENTS];
+
+//variables dealing with reading and echoing
+int i = 0;
+int max_array_index = -1;
+
+char* byte_pointer;
+int bytes_to_read;
+int bytes_read;
+char read_buffer[BUFFER_LENGTH];
+
+//prototypes
+
+int processConnections();
+
 int main ()
 {
-	//socket handling variables
-	int listen_socket, client_socket;
-	int retval;							//holds a return value for testing failures
-	struct sockaddr_in listen_address, client_address;
-	unsigned int client_address_size;
-
-
-	// file descriptor handling variables
-	int max_filedescriptors;			//the number of file descriptors used
-	fd_set master_filedescriptors;		//the master set of file descriptors
-	fd_set copy_filedescriptors;		//holds a copy of the master set
-	int clients[MAX_CLIENTS];
-
-	//variables dealing with reading and echoing
-	int i = 0;
-	int max_array_index = -1;
-
-	char* byte_pointer;
-	int bytes_to_read;
-	int bytes_read;
-	char read_buffer[BUFFER_LENGTH];
 	
 	//start server
 	//create a stream socket
@@ -82,8 +87,30 @@ int main ()
 	FD_ZERO( &master_filedescriptors );
 	FD_SET( listen_socket, &master_filedescriptors );
 
-	//do work
+	//fork a child process
+	pid_t pid = fork();
 
+	if (pid == -1)
+	{
+		//fork failed
+	}
+	else if ( pid == 0 )
+	{
+		//child process
+		processConnections();
+		return 0;
+	}
+	else
+	{
+		//parent process
+	}
+
+	
+	return 0;
+}
+
+int processConnections()
+{
 	//go into a forever loop
 	for (;;)
 	{
@@ -113,7 +140,7 @@ int main ()
 			}
 			
 			//message
-			std::cout << "New socket accepted" << std::endl;
+			std::cout << "New socket accepted. Client address: " << inet_ntoa(client_address.sin_addr) << std::endl;
 
 			//add the new socket to the file descriptor set
 			for ( i = 0 ; i < FD_SETSIZE ; i++ )
@@ -122,16 +149,16 @@ int main ()
 				{
 					//save the descriptor
 					clients[i] = client_socket;
-					std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
+					//std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
 
 					//add the descriptor to the set
 					FD_SET ( client_socket, &master_filedescriptors );
 
 					if ( client_socket > max_filedescriptors )
-					{	
+					{
 						//update max_filedescriptors
 						max_filedescriptors = client_socket;
-						std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
+						//std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
 
 					}
 
@@ -139,14 +166,14 @@ int main ()
 					{
 						//update max index in array
 						max_array_index = i;
-						std::cout << "new max array index: " << max_array_index << std::endl;
+						//std::cout << "new max array index: " << max_array_index << std::endl;
 					}
 
 
 					if ( --num_ready_descriptors <= 0 )
 					{
 						//no more descriptors ready
-						std::cout << "no more descriptors available" << std::endl;
+						//std::cout << "no more descriptors available" << std::endl;
 						continue;
 					}
 				}
@@ -165,7 +192,7 @@ int main ()
 			//??
 			if ( FD_ISSET ( client_socket, &copy_filedescriptors ) )
 			{
-				std::cout << "file descriptor is set" << std::endl;
+				//std::cout << "file descriptor is set" << std::endl;
 				byte_pointer = read_buffer;
 				bytes_to_read = BUFFER_LENGTH;
 
@@ -177,10 +204,14 @@ int main ()
 				}
 
 				//echo data to all connected clients
+				std::cout << "broadcasting message: " << read_buffer << std::endl;
 				for ( i = 0 ; i < clients[i] ; i++ )
 				{
-					std::cout << "broadcasting message: " << read_buffer << std::endl;
-					write ( clients[i], read_buffer, BUFFER_LENGTH );
+					//do not send the message back to the sender
+					if ( client_socket != clients[i] )
+					{
+						write ( clients[i], read_buffer, BUFFER_LENGTH );
+					}
 				}
 			}
 		}
