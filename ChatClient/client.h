@@ -18,6 +18,8 @@
 #include <QDebug>
 
 void ConnectToServer(int port, char* ip, void *app);
+void CloseConnection();
+void SendMessage(const char*, int);
 
 #endif // CLIENT
 

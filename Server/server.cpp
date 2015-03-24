@@ -8,12 +8,14 @@
 #include <unistd.h>
 #include <iostream>
 
+using namespace std;
+
 #define DEFAULT_PORT 7000
 #define MAX_CLIENTS 5
 #define BUFFER_LENGTH 255
 
 //socket handling variables
-int listen_socket, client_socket;
+int listen_socket, client_socket, sockFd;
 int retval;							//holds a return value for testing failures
 struct sockaddr_in listen_address, client_address;
 unsigned int client_address_size;
@@ -23,7 +25,7 @@ unsigned int client_address_size;
 int max_filedescriptors;			//the number of file descriptors used
 fd_set master_filedescriptors;		//the master set of file descriptors
 fd_set copy_filedescriptors;		//holds a copy of the master set
-int clients[MAX_CLIENTS];
+int clients[FD_SETSIZE];
 
 //variables dealing with reading and echoing
 int i = 0;
@@ -83,27 +85,14 @@ int main ()
 	//set the largest file descriptor
 	max_filedescriptors = listen_socket;
 
+	for (i = 0; i < FD_SETSIZE; i++)
+           	clients[i] = -1;             // -1 indicates available entry
+
 	//initialize the master file descriptor set and add the listen socket to it
 	FD_ZERO( &master_filedescriptors );
 	FD_SET( listen_socket, &master_filedescriptors );
 
-	//fork a child process
-	pid_t pid = fork();
-
-	if (pid == -1)
-	{
-		//fork failed
-	}
-	else if ( pid == 0 )
-	{
-		//child process
-		processConnections();
-		return 0;
-	}
-	else
-	{
-		//parent process
-	}
+	processConnections();
 
 	
 	return 0;
@@ -119,6 +108,7 @@ int processConnections()
 
 		//call select to monitor multiple file descriptors
 		int num_ready_descriptors = select ( ( max_filedescriptors + 1 ), &copy_filedescriptors, NULL, NULL, NULL );
+		
 		if ( num_ready_descriptors == -1 )
 		{
 			//select failure
@@ -150,57 +140,67 @@ int processConnections()
 					//save the descriptor
 					clients[i] = client_socket;
 					//std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
-
-					//add the descriptor to the set
-					FD_SET ( client_socket, &master_filedescriptors );
-
-					if ( client_socket > max_filedescriptors )
-					{
-						//update max_filedescriptors
-						max_filedescriptors = client_socket;
-						//std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
-
-					}
-
-					if ( i < max_array_index )
-					{
-						//update max index in array
-						max_array_index = i;
-						//std::cout << "new max array index: " << max_array_index << std::endl;
-					}
-
-
-					if ( --num_ready_descriptors <= 0 )
-					{
-						//no more descriptors ready
-						//std::cout << "no more descriptors available" << std::endl;
-						continue;
-					}
+					break;
 				}
 			}
+
+			if (i == FD_SETSIZE)
+			{
+				std::cout << "Too many clients" << std::endl;
+				exit(1);
+			}
+			//add the descriptor to the set
+			FD_SET ( client_socket, &master_filedescriptors );
+
+			if ( client_socket > max_filedescriptors )
+			{
+				//update max_filedescriptors
+				max_filedescriptors = client_socket;
+				//std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
+			}
+
+			if ( i > max_array_index )
+			{
+				//update max index in array
+				max_array_index = i;
+				//std::cout << "new max array index: " << max_array_index << std::endl;
+			}
+
+
+			if ( --num_ready_descriptors <= 0 )
+			{
+				//no more descriptors ready
+				//std::cout << "no more descriptors available" << std::endl;
+				continue;
+			}
+			
+			
 		}
 
 		//check for any new data
 		for ( i = 0 ; i <= max_array_index ; i++ )
 		{
 			//if the socket has no data, skip it
-			if ( (client_socket = clients[i]) < 0 )
+			if ( (sockFd = clients[i]) < 0 )
 			{
 				continue;
 			}
 
-			//??
-			if ( FD_ISSET ( client_socket, &copy_filedescriptors ) )
+			//check for data
+			if ( FD_ISSET ( sockFd, &copy_filedescriptors ) )
 			{
-				//std::cout << "file descriptor is set" << std::endl;
+
+				std::cout << "file descriptor is set" << std::endl;
 				byte_pointer = read_buffer;
 				bytes_to_read = BUFFER_LENGTH;
 
 				//read data in
-				while ( ( bytes_read = read ( client_socket, byte_pointer, bytes_to_read ) ) > 0 )
+			    bytes_read = read ( sockFd, byte_pointer, bytes_to_read );
+				
+				if (bytes_read == 0)
 				{
-						byte_pointer += bytes_read;
-						bytes_to_read -= bytes_read;
+					std::cout << "Remote Address: " << inet_ntoa(client_address.sin_addr) << " closed connection" << std::endl;
+					close(sockFd);
 				}
 
 				//echo data to all connected clients
@@ -208,13 +208,17 @@ int processConnections()
 				for ( i = 0 ; i < clients[i] ; i++ )
 				{
 					//do not send the message back to the sender
-					if ( client_socket != clients[i] )
+					if ( sockFd != clients[i] )
 					{
 						write ( clients[i], read_buffer, BUFFER_LENGTH );
 					}
 				}
+
+				if (--num_ready_descriptors <= 0)
+            			break;  
 			}
 		}
 	}
+
 	return 0;
 }

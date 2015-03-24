@@ -27,6 +27,8 @@ private slots:
     void addToList(QString);
     void removeFromList(int);
 
+    void on_btnSend_clicked();
+
 private:
     Ui::Application *ui;
     QVector<QString> usrList;

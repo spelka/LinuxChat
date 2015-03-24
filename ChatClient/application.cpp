@@ -16,6 +16,7 @@ Application::Application(QWidget *parent) :
 
 Application::~Application()
 {
+    CloseConnection();
     delete ui;
 }
 
@@ -78,3 +79,11 @@ void Application::removeFromList(int index)
     ui->listUsers->setModel(new QStringListModel(QList<QString>::fromVector(usrList)));
 }
 
+
+void Application::on_btnSend_clicked()
+{
+    QString text = ui->msgEdit->toPlainText();
+    int size = text.size();
+
+    SendMessage(text.toUtf8().constData(), size);
+}

@@ -50,6 +50,14 @@ void ConnectToServer(int port, char *ip, void *app)
             .arg(inet_ntop(hostPtr->h_addrtype, pptr, serverAddress, sizeof(serverAddress)));
     mainWindow->appendMessage(strInfo);
 
+}
 
+void SendMessage(const char* msg, int size)
+{
+    send (clientSocket, msg, size, 0);
+}
+
+void CloseConnection()
+{
     close(clientSocket);
 }
