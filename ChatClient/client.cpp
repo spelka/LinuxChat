@@ -3,24 +3,33 @@
 #include "application.h"
 
 Application *mainWindow;
+
 int clientSocket;
 
-void ConnectToServer(int port, QString ip, void *app)
+void ConnectToServer(int port, char *ip, void *app)
 {
+    QString strInfo;
     struct hostent	*hostPtr;
     struct sockaddr_in serv_addr;
+    char **pptr;
+    char serverAddress[IP_LEN];
 
-    if (clientSocket = socket(AF_INET, SOCK_STREAM, 0) == -1)
+    mainWindow = (Application*) app;
+
+
+    if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         qDebug() << "Cannot create socket";
         return;
     }
 
+    qDebug() << "Connecting to ip: " << ip << " Port: " << port;
+
 
     bzero((char *)&serv_addr, sizeof(struct sockaddr_in));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
-    if ((hostPtr = gethostbyname(ip.toUtf8().constData())) == NULL)
+    if ((hostPtr = gethostbyname(ip)) == NULL)
     {
         qDebug() << "Unknown server address";
         return;
@@ -28,5 +37,19 @@ void ConnectToServer(int port, QString ip, void *app)
 
     bcopy(hostPtr->h_addr, (char *)&serv_addr.sin_addr, hostPtr->h_length);
 
+    if (connect (clientSocket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
+    {
+        perror("connect");
+        return;
+    }
 
+
+    qDebug() << "Connected: Server Name: " << hostPtr->h_name;
+
+    strInfo = QString("Connected to chatroom server: %1")
+            .arg(inet_ntop(hostPtr->h_addrtype, pptr, serverAddress, sizeof(serverAddress)));
+    mainWindow->appendMessage(strInfo);
+
+
+    close(clientSocket);
 }

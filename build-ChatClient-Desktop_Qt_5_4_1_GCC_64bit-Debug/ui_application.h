@@ -15,13 +15,14 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -34,10 +35,12 @@ public:
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
     QGridLayout *gridLayout;
-    QLineEdit *msgEdit;
-    QListView *clientList;
-    QPushButton *btnSend;
+    QLabel *label;
+    QTextEdit *msgEdit;
+    QListView *listUsers;
     QTextBrowser *txtConvo;
+    QLabel *label_2;
+    QPushButton *btnSend;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -58,26 +61,44 @@ public:
         gridLayout = new QGridLayout();
         gridLayout->setSpacing(6);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        msgEdit = new QLineEdit(centralWidget);
+        label = new QLabel(centralWidget);
+        label->setObjectName(QStringLiteral("label"));
+        label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout->addWidget(label, 0, 0, 1, 1);
+
+        msgEdit = new QTextEdit(centralWidget);
         msgEdit->setObjectName(QStringLiteral("msgEdit"));
+        msgEdit->setMaximumSize(QSize(16777215, 50));
 
-        gridLayout->addWidget(msgEdit, 1, 1, 1, 1);
+        gridLayout->addWidget(msgEdit, 2, 1, 1, 1);
 
-        clientList = new QListView(centralWidget);
-        clientList->setObjectName(QStringLiteral("clientList"));
-        clientList->setMaximumSize(QSize(250, 16777215));
+        listUsers = new QListView(centralWidget);
+        listUsers->setObjectName(QStringLiteral("listUsers"));
+        listUsers->setMaximumSize(QSize(175, 16777215));
+        listUsers->setStyleSheet(QLatin1String("border-radius: 10px;\n"
+"background: white;"));
 
-        gridLayout->addWidget(clientList, 0, 0, 1, 1);
-
-        btnSend = new QPushButton(centralWidget);
-        btnSend->setObjectName(QStringLiteral("btnSend"));
-
-        gridLayout->addWidget(btnSend, 1, 2, 1, 1);
+        gridLayout->addWidget(listUsers, 1, 0, 1, 1);
 
         txtConvo = new QTextBrowser(centralWidget);
         txtConvo->setObjectName(QStringLiteral("txtConvo"));
+        txtConvo->setStyleSheet(QLatin1String("border-radius: 10px;\n"
+"background: white;"));
 
-        gridLayout->addWidget(txtConvo, 0, 1, 1, 2);
+        gridLayout->addWidget(txtConvo, 1, 1, 1, 3);
+
+        label_2 = new QLabel(centralWidget);
+        label_2->setObjectName(QStringLiteral("label_2"));
+
+        gridLayout->addWidget(label_2, 0, 1, 1, 1);
+
+        btnSend = new QPushButton(centralWidget);
+        btnSend->setObjectName(QStringLiteral("btnSend"));
+        btnSend->setMaximumSize(QSize(16777215, 50));
+        btnSend->setStyleSheet(QStringLiteral(""));
+
+        gridLayout->addWidget(btnSend, 2, 2, 1, 2);
 
 
         gridLayout_2->addLayout(gridLayout, 0, 0, 1, 1);
@@ -85,7 +106,7 @@ public:
         Application->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(Application);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 845, 30));
+        menuBar->setGeometry(QRect(0, 0, 845, 25));
         Application->setMenuBar(menuBar);
         mainToolBar = new QToolBar(Application);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -105,6 +126,8 @@ public:
     {
         Application->setWindowTitle(QApplication::translate("Application", "Application", 0));
         actionConnect_to_server->setText(QApplication::translate("Application", "Connect to server", 0));
+        label->setText(QApplication::translate("Application", "Users:", 0));
+        label_2->setText(QApplication::translate("Application", "Conversation:", 0));
         btnSend->setText(QApplication::translate("Application", "Send", 0));
     } // retranslateUi
 
