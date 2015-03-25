@@ -51,7 +51,7 @@ void ConnectToServer(int port, char *ip, void *app)
             .arg(inet_ntop(hostPtr->h_addrtype, pptr, serverAddress, sizeof(serverAddress)));
     mainWindow->appendMessage(strInfo);
 
-    pthread_create (&threadRead, NULL, readThrd, (void*)clientSocket);
+    pthread_create (&threadRead, NULL, readThrd, (void*)1);
     qDebug() << "Pthread created";
 
 }
@@ -68,8 +68,6 @@ void* readThrd(void *param)
     QRegExp rxMsg("usr: *");
 
     QString str;
-
-    int* passedSocket = (int *) param;
 
     while(true)
     {
@@ -88,6 +86,11 @@ void* readThrd(void *param)
         if (rxUsrRemove.indexIn(buf) != -1)
         {
 
+            tok = strtok(buf, ":");
+            tok = strtok(NULL, ":");
+            qDebug() << "User left: " << tok;
+            str = tok;
+            mainWindow->removeUser(str);
         }
         if (rxMsg.indexIn(buf) != -1)
         {
@@ -97,13 +100,9 @@ void* readThrd(void *param)
             tok = strtok(NULL, ":");
             str.append(": ");
             str.append(tok);
-
             mainWindow->appendMessage(str);
         }
-
-        qDebug() << "Received: " << buf;
     }
-
 }
 
 void SendMessage(const char* msg, int size)

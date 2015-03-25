@@ -27,6 +27,7 @@ private slots:
     void addToList(QString);
     void removeFromList(QString);
     void on_btnSend_clicked();
+    void onReturnPressed();
 
 private:
     Ui::Application *ui;
