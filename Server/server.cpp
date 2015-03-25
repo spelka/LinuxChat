@@ -1,56 +1,55 @@
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <strings.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <iostream>
-#include <vector>
+/*--------------------------------------------------------------------------------------------
+-- SOURCE FILE:		server.cpp 		An application that reads, processes, and echoes data out 
+--									to clients.
+--
+-- PROGRAM:			Linux Chat
+--
+-- FUNCTIONS:
+--					int main()
+--
+-- DATE:			March 20, 2015
+--
+-- REVISIONS:
+--
+-- DESIGNER:		Sebastian Pelka
+--
+-- PROGRAMMER:		Sebastian Pelka
+--
+-- NOTES:
+-- based on code found at www.milliways.bcit.ca/c4981, by Aman Abdulla
+--
+----------------------------------------------------------------------------------------------*/
 
-using namespace std;
-
-#define DEFAULT_PORT 7000
-#define MAX_CLIENTS 5
-#define BUFFER_LENGTH 1024
-#define SEND_LIST 1
-
-//socket handling variables
-int listen_socket, client_socket, sockFd;
-int retval;							//holds a return value for testing failures
-struct sockaddr_in listen_address, client_address;
-unsigned int client_address_size;
-
-
-// file descriptor handling variables
+#include "serverFunc.h"
+int listen_socket;
+fd_set master_filedescriptors;		//the master set of file descriptors
 int max_filedescriptors;			//the number of file descriptors used
 int num_ready_descriptors;
-fd_set master_filedescriptors;		//the master set of file descriptors
-fd_set copy_filedescriptors;		//holds a copy of the master set
-int clients[FD_SETSIZE];
-
-//variables dealing with reading and echoing
-int i = 0;
 int max_array_index = -1;
+int clients[FD_SETSIZE];
+struct sockaddr_in client_address;
+fd_set copy_filedescriptors;		//holds a copy of the master set
 
-char* byte_pointer;
-int bytes_to_read;
-int bytes_read;
-char read_buffer[BUFFER_LENGTH];
-
-vector<string> userList;
-
-//prototypes
-
-int processConnections();
-int processUsrName(char*);
-void listenNewConnections();
-void checkForData();
-
+/*--------------------------------------------------------------------------------------------
+-- FUNCTION:	main
+--
+-- DATE:		March 20, 2015
+--
+-- REVISIONS:	
+--
+-- DESIGNER: 	Sebastian Pelka
+-- 
+-- PROGRAMMER:	Sebastian Pelka
+--
+-- INTERFACE:	int main ()
+--
+-- RETURNS:		returns 1 if the function fails, 0 if succesful
+-- 
+-- NOTES:		the main entry point the LinuxChat program. Initializes the listening socket.
+----------------------------------------------------------------------------------------------*/
 int main ()
 {
+	struct sockaddr_in listen_address;
 	
 	//start server
 	//create a stream socket
@@ -65,7 +64,7 @@ int main ()
 
 	//set SO_REUSEADDR for the listen socket
 	int arg = 1;
-	retval = setsockopt ( listen_socket, SOL_SOCKET, SO_REUSEADDR, &arg, sizeof(arg) );
+	int retval = setsockopt ( listen_socket, SOL_SOCKET, SO_REUSEADDR, &arg, sizeof(arg) );
 	if ( retval == -1 )
 	{
 		//set socket option failure
@@ -94,7 +93,7 @@ int main ()
 	//set the largest file descriptor
 	max_filedescriptors = listen_socket;
 
-	for (i = 0; i < FD_SETSIZE; i++)
+	for (int i = 0; i < FD_SETSIZE; i++)
            	clients[i] = -1;             // -1 indicates available entry
 
 	//initialize the master file descriptor set and add the listen socket to it
@@ -107,9 +106,26 @@ int main ()
 	return 0;
 }
 
+/*--------------------------------------------------------------------------------------------
+-- FUNCTION:	processConnections
+--
+-- DATE:		March 20, 2015
+--
+-- REVISIONS:	
+--
+-- DESIGNER: 	Sebastian Pelka
+-- 
+-- PROGRAMMER:	Sebastian Pelka
+--
+-- INTERFACE:	int processConnections()
+--
+-- RETURNS:		returns 1 if the function fails
+--
+-- NOTES:		this function is used to initialize file descriptors for reading and writing
+--
+----------------------------------------------------------------------------------------------*/
 int processConnections()
 {
-
 	
 	//go into a forever loop
 	for (;;)
@@ -129,81 +145,125 @@ int processConnections()
 
 		listenNewConnections();
 
-		checkForData();
-
-
-		
+		checkForData();		
 	}
-
 	return 0;
 }
 
+/*--------------------------------------------------------------------------------------------
+-- FUNCTION:	listenNewConnections
+--
+-- DATE:		March 20, 2015
+--
+-- REVISIONS:	 
+--
+-- DESIGNER: 	Sebastian Pelka
+-- 
+-- PROGRAMMER:	Sebastian Pelka
+--
+-- INTERFACE:	void listenNewConnections()
+--
+-- RETURNS:		void
+--
+-- NOTES:		listens for new connections on the listening socket, creates a socket, and adds
+--				it to an array of sockets. Updates file descriptors as well.
+--
+----------------------------------------------------------------------------------------------*/
 void listenNewConnections()
 {
+	int client_socket;
+	unsigned int client_address_size;
+
+	//variables dealing with reading and echoing
+	int i = 0;
+
 	//check for any new connections
-		if (FD_ISSET(listen_socket, &copy_filedescriptors))
+	if (FD_ISSET(listen_socket, &copy_filedescriptors))
+	{
+		//accept the new socket request
+		client_address_size = sizeof ( client_address );
+		client_socket = accept ( listen_socket, (struct sockaddr *) &client_address, &client_address_size );
+		if ( client_socket == -1)
 		{
-			//accept the new socket request
-			client_address_size = sizeof ( client_address );
-			client_socket = accept ( listen_socket, (struct sockaddr *) &client_address, &client_address_size );
-			if ( client_socket == -1)
-			{
-				//failed to accept socket
-				std::cout << "ERROR: accept call failed" << std::endl;
-			}
-			
-			//message
-			std::cout << "New socket accepted. Client address: " << inet_ntoa(client_address.sin_addr) << std::endl;
-
-			//add the new socket to the file descriptor set
-			for ( i = 0 ; i < FD_SETSIZE ; i++ )
-			{
-				if ( clients[i] < 0 )
-				{
-					//save the descriptor
-					clients[i] = client_socket;
-					//std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
-					break;
-				}
-			}
-
-			if (i == FD_SETSIZE)
-			{
-				std::cout << "Too many clients" << std::endl;
-				exit(1);
-			}
-			//add the descriptor to the set
-			FD_SET ( client_socket, &master_filedescriptors );
-
-			if ( client_socket > max_filedescriptors )
-			{
-				//update max_filedescriptors
-				max_filedescriptors = client_socket;
-				//std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
-			}
-
-			if ( i > max_array_index )
-			{
-				//update max index in array
-				max_array_index = i;
-				//std::cout << "new max array index: " << max_array_index << std::endl;
-			}
-
-
-			if ( --num_ready_descriptors <= 0 )
-			{
-				//no more descriptors ready
-				//std::cout << "no more descriptors available" << std::endl;
-			}
-			
-			
+			//failed to accept socket
+			std::cout << "ERROR: accept call failed" << std::endl;
 		}
+		
+		//message
+		std::cout << "New socket accepted. Client address: " << inet_ntoa(client_address.sin_addr) << std::endl;
+
+		//add the new socket to the file descriptor set
+		for ( i = 0 ; i < FD_SETSIZE ; i++ )
+		{
+			if ( clients[i] < 0 )
+			{
+				//save the descriptor
+				clients[i] = client_socket;
+				//std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
+				break;
+			}
+		}
+
+		if (i == FD_SETSIZE)
+		{
+			std::cout << "Too many clients" << std::endl;
+			exit(1);
+		}
+		//add the descriptor to the set
+		FD_SET ( client_socket, &master_filedescriptors );
+
+		if ( client_socket > max_filedescriptors )
+		{
+			//update max_filedescriptors
+			max_filedescriptors = client_socket;
+			//std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
+		}
+
+		if ( i > max_array_index )
+		{
+			//update max index in array
+			max_array_index = i;
+			//std::cout << "new max array index: " << max_array_index << std::endl;
+		}
+
+
+		if ( --num_ready_descriptors <= 0 )
+		{
+			//no more descriptors ready
+			//std::cout << "no more descriptors available" << std::endl;
+		}
+	}
 }
+
+/*--------------------------------------------------------------------------------------------
+-- FUNCTION:	checkForData
+--
+-- DATE:		March 20, 2015
+--
+-- REVISIONS:	 
+--
+-- DESIGNER: 	Sebastian Pelka
+-- 
+-- PROGRAMMER:	Sebastian Pelka
+--
+-- INTERFACE:	void listenNewConnections()
+--
+-- RETURNS:		void
+--
+-- NOTES:		listens for new connections on the listening socket, creates a socket, and adds
+--				it to an array of sockets. Updates file descriptors as well.
+--
+----------------------------------------------------------------------------------------------*/
 void checkForData()
 {
 	int command;
+	int sockFd;
+	char* byte_pointer;
+	int bytes_to_read;
+	int bytes_read;
+	char read_buffer[BUFFER_LENGTH];
 	//check for any new data
-	for ( i = 0 ; i <= max_array_index ; i++ )
+	for ( int i = 0 ; i <= max_array_index ; i++ )
 	{
 		//if the socket has no data, skip it
 		if ( (sockFd = clients[i]) < 0 )
@@ -264,6 +324,12 @@ void checkForData()
 	}
 }
 
+/*--------------------------------------------------------------------------------------------
+--
+--
+--
+--
+----------------------------------------------------------------------------------------------*/
 int processUsrName(char* s)
 {
 
