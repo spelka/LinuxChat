@@ -26,7 +26,6 @@ private slots:
     void on_actionConnect_to_server_triggered();
     void addToList(QString);
     void removeFromList(QString);
-
     void on_btnSend_clicked();
 
 private:

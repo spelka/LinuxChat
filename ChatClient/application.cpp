@@ -16,6 +16,11 @@ Application::Application(QWidget *parent) :
 
 Application::~Application()
 {
+    QString str;
+    str = QString("remove: %1").arg(displayName);
+
+    SendMessage(str.toUtf8().constData(), str.size());
+
     CloseConnection();
     delete ui;
 }
@@ -69,9 +74,12 @@ void Application::removeUser(QString usr)
  */
 void Application::addToList(QString str)
 {
-    usrList.push_back(str);
+    if (!usrList.contains(str))
+    {
+        usrList.push_back(str);
 
-    ui->listUsers->setModel(new QStringListModel(QList<QString>::fromVector(usrList)));
+        ui->listUsers->setModel(new QStringListModel(QList<QString>::fromVector(usrList)));
+    }
 }
 
 /**

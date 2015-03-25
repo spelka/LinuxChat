@@ -8,12 +8,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
 #define DEFAULT_PORT 7000
 #define MAX_CLIENTS 5
-#define BUFFER_LENGTH 255
+#define BUFFER_LENGTH 1024
+#define SEND_LIST 1
 
 //socket handling variables
 int listen_socket, client_socket, sockFd;
@@ -24,6 +26,7 @@ unsigned int client_address_size;
 
 // file descriptor handling variables
 int max_filedescriptors;			//the number of file descriptors used
+int num_ready_descriptors;
 fd_set master_filedescriptors;		//the master set of file descriptors
 fd_set copy_filedescriptors;		//holds a copy of the master set
 int clients[FD_SETSIZE];
@@ -37,9 +40,14 @@ int bytes_to_read;
 int bytes_read;
 char read_buffer[BUFFER_LENGTH];
 
+vector<string> userList;
+
 //prototypes
 
 int processConnections();
+int processUsrName(char*);
+void listenNewConnections();
+void checkForData();
 
 int main ()
 {
@@ -101,6 +109,8 @@ int main ()
 
 int processConnections()
 {
+
+	
 	//go into a forever loop
 	for (;;)
 	{
@@ -108,7 +118,7 @@ int processConnections()
 		copy_filedescriptors = master_filedescriptors;
 
 		//call select to monitor multiple file descriptors
-		int num_ready_descriptors = select ( ( max_filedescriptors + 1 ), &copy_filedescriptors, NULL, NULL, NULL );
+		num_ready_descriptors = select ( ( max_filedescriptors + 1 ), &copy_filedescriptors, NULL, NULL, NULL );
 		
 		if ( num_ready_descriptors == -1 )
 		{
@@ -117,7 +127,20 @@ int processConnections()
 			return 1;
 		}
 
-		//check for any new connections
+		listenNewConnections();
+
+		checkForData();
+
+
+		
+	}
+
+	return 0;
+}
+
+void listenNewConnections()
+{
+	//check for any new connections
 		if (FD_ISSET(listen_socket, &copy_filedescriptors))
 		{
 			//accept the new socket request
@@ -127,7 +150,6 @@ int processConnections()
 			{
 				//failed to accept socket
 				std::cout << "ERROR: accept call failed" << std::endl;
-				continue;
 			}
 			
 			//message
@@ -172,64 +194,107 @@ int processConnections()
 			{
 				//no more descriptors ready
 				//std::cout << "no more descriptors available" << std::endl;
-				continue;
 			}
 			
 			
 		}
-
-
-		//check for any new data
-		for ( i = 0 ; i <= max_array_index ; i++ )
+}
+void checkForData()
+{
+	int command;
+	//check for any new data
+	for ( i = 0 ; i <= max_array_index ; i++ )
+	{
+		//if the socket has no data, skip it
+		if ( (sockFd = clients[i]) < 0 )
 		{
-			//if the socket has no data, skip it
-			if ( (sockFd = clients[i]) < 0 )
+			continue;
+		}
+
+		//check for data
+		if ( FD_ISSET ( sockFd, &copy_filedescriptors ) )
+		{
+
+			std::cout << "file descriptor is set" << std::endl;
+			byte_pointer = read_buffer;
+			bytes_to_read = BUFFER_LENGTH;
+
+			//read data in
+		    bytes_read = read ( sockFd, byte_pointer, bytes_to_read );
+			
+			if (bytes_read == 0)
 			{
-				continue;
+				std::cout << "Remote Address: " << inet_ntoa(client_address.sin_addr) << " closed connection" << std::endl;
+				close(sockFd);
+				FD_CLR(sockFd, &master_filedescriptors);
+				clients[i] = -1;
+
+				sprintf(read_buffer, "%s", "client disconnected");
 			}
 
-			//check for data
-			if ( FD_ISSET ( sockFd, &copy_filedescriptors ) )
+	
+			//echo data to all connected clients
+			std::cout << "broadcasting message: " << read_buffer << std::endl;
+			for ( i = 0 ; i < clients[i] ; i++ )
 			{
-
-				std::cout << "file descriptor is set" << std::endl;
-				byte_pointer = read_buffer;
-				bytes_to_read = BUFFER_LENGTH;
-
-				//read data in
-			    bytes_read = read ( sockFd, byte_pointer, bytes_to_read );
-				
-				if (bytes_read == 0)
+				//do not send the message back to the sender
+				if ( sockFd != clients[i] )
 				{
-					std::cout << "Remote Address: " << inet_ntoa(client_address.sin_addr) << " closed connection" << std::endl;
-					close(sockFd);
-					FD_CLR(sockFd, &master_filedescriptors);
-					clients[i] = -1;
-
-					sprintf(read_buffer, "%s", "client disconnected");
+					write ( clients[i], read_buffer, BUFFER_LENGTH );
 				}
+			}
 
+					command = processUsrName(read_buffer);
 
-
-				//echo data to all connected clients
-				std::cout << "broadcasting message: " << read_buffer << std::endl;
-				for ( i = 0 ; i < clients[i] ; i++ )
+			if (command == SEND_LIST)
+			{
+				for (int j = 0; j < userList.size(); j++)
 				{
-					//do not send the message back to the sender
-					if ( sockFd != clients[i] )
-					{
-						write ( clients[i], read_buffer, BUFFER_LENGTH );
-					}
+					char temp[BUFFER_LENGTH];
+					sprintf(temp, "add:%s", userList[j].c_str());
+					for ( i = 0 ; i < clients[i] ; i++ )
+							write(clients[i], temp, BUFFER_LENGTH);
 				}
+			}
 
-				memset(read_buffer, 0, sizeof(read_buffer));
+			memset(read_buffer, 0, sizeof(read_buffer));
 
-				if (--num_ready_descriptors <= 0)
-            			break;  
+			if (--num_ready_descriptors <= 0)
+        			break;  
+		}
+	}
+}
+
+int processUsrName(char* s)
+{
+
+	char *tok;
+	tok = (char*)malloc(BUFFER_LENGTH);
+
+	tok = strtok(s, ":");
+
+	if (strcmp(tok, "add") == 0)
+	{
+		tok = strtok(NULL, ":");
+		string usr = tok;
+		userList.push_back(usr);
+
+		cout << "Adding to vector: " << usr << endl;
+
+		return SEND_LIST;
+	}
+	else if (strcmp(tok, "remove") == 0)
+	{
+		tok = strtok(NULL, ":");
+		for ( int j = 0; j < userList.size(); j++ )
+		{
+			if (strcmp(userList.at(j).c_str(), tok) == 0)
+			{
+				cout << "Removing user: " << tok << endl;
+				userList.erase(userList.begin() + j);
 			}
 		}
 	}
 
 	return 0;
 }
-
