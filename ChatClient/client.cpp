@@ -83,7 +83,7 @@ void* readThrd(void *param)
             str = tok;
             mainWindow->addUser(str);
         }
-        if (rxUsrRemove.indexIn(buf) != -1)
+        else if (rxUsrRemove.indexIn(buf) != -1)
         {
 
             tok = strtok(buf, ":");
@@ -92,7 +92,7 @@ void* readThrd(void *param)
             str = tok;
             mainWindow->removeUser(str);
         }
-        if (rxMsg.indexIn(buf) != -1)
+        else if (rxMsg.indexIn(buf) != -1)
         {
             tok = strtok(buf, ":");
             tok = strtok(NULL, ":");
