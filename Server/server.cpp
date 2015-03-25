@@ -234,7 +234,7 @@ void checkForData()
 
 			//echo data to all connected clients
 			std::cout << "broadcasting message: " << read_buffer << std::endl;
-			for ( i = 0 ; i < clients[i] ; i++ )
+			for ( i = 0 ; i < FD_SETSIZE ; i++ )
 			{
 				//do not send the message back to the sender
 				if ( sockFd != clients[i] )
@@ -294,6 +294,6 @@ int processUsrName(char* s)
 			}
 		}
 	}
-
+	
 	return 0;
 }

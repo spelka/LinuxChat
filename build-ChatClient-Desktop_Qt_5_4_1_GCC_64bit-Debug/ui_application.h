@@ -96,6 +96,7 @@ public:
 
         msgEdit = new QLineEdit(centralWidget);
         msgEdit->setObjectName(QStringLiteral("msgEdit"));
+        msgEdit->setMaxLength(512);
 
         gridLayout->addWidget(msgEdit, 2, 1, 1, 1);
 
