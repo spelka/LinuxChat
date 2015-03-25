@@ -294,6 +294,6 @@ int processUsrName(char* s)
 			}
 		}
 	}
-
+	
 	return 0;
 }
