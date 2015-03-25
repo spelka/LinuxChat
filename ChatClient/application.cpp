@@ -12,6 +12,7 @@ Application::Application(QWidget *parent) :
     connect(this, SIGNAL(valueChangedConvo(QString)), ui->txtConvo, SLOT(append(QString)));
     connect(this, SIGNAL(valueChangedUsr(QString)), this, SLOT(addToList(QString)));
     connect(this, SIGNAL(valueUsrRemoved(QString)), this, SLOT(removeFromList(QString)));
+    connect(ui->msgEdit, SIGNAL(returnPressed()), this, SLOT(onReturnPressed()));
 }
 
 Application::~Application()
@@ -101,11 +102,28 @@ void Application::on_btnSend_clicked()
 {
     QString text;
 
-    text = QString("usr:%1:%2").arg(displayName).arg(ui->msgEdit->toPlainText());
+    text = QString("usr:%1:%2").arg(displayName).arg(ui->msgEdit->text());
 
     int size = text.size();
 
-    appendMessage("Me: " + ui->msgEdit->toPlainText());
+    appendMessage("Me: " + ui->msgEdit->text());
 
     SendMessage(text.toUtf8().constData(), size);
+
+    ui->msgEdit->clear();
+}
+
+void Application::onReturnPressed()
+{
+    QString text;
+
+    text = QString("usr:%1:%2").arg(displayName).arg(ui->msgEdit->text());
+
+    int size = text.size();
+
+    appendMessage("Me: " + ui->msgEdit->text());
+
+    SendMessage(text.toUtf8().constData(), size);
+
+    ui->msgEdit->clear();
 }

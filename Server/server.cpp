@@ -229,10 +229,9 @@ void checkForData()
 				FD_CLR(sockFd, &master_filedescriptors);
 				clients[i] = -1;
 
-				sprintf(read_buffer, "%s", "client disconnected");
+				sprintf(read_buffer, "%s", "client disconnected"); // Leave this here
 			}
 
-	
 			//echo data to all connected clients
 			std::cout << "broadcasting message: " << read_buffer << std::endl;
 			for ( i = 0 ; i < clients[i] ; i++ )
@@ -244,7 +243,7 @@ void checkForData()
 				}
 			}
 
-					command = processUsrName(read_buffer);
+			command = processUsrName(read_buffer);
 
 			if (command == SEND_LIST)
 			{

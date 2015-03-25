@@ -16,13 +16,13 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
-#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -36,11 +36,11 @@ public:
     QGridLayout *gridLayout_2;
     QGridLayout *gridLayout;
     QLabel *label;
-    QTextEdit *msgEdit;
     QListView *listUsers;
     QTextBrowser *txtConvo;
     QLabel *label_2;
     QPushButton *btnSend;
+    QLineEdit *msgEdit;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -66,12 +66,6 @@ public:
         label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
-
-        msgEdit = new QTextEdit(centralWidget);
-        msgEdit->setObjectName(QStringLiteral("msgEdit"));
-        msgEdit->setMaximumSize(QSize(16777215, 50));
-
-        gridLayout->addWidget(msgEdit, 2, 1, 1, 1);
 
         listUsers = new QListView(centralWidget);
         listUsers->setObjectName(QStringLiteral("listUsers"));
@@ -99,6 +93,11 @@ public:
         btnSend->setStyleSheet(QStringLiteral(""));
 
         gridLayout->addWidget(btnSend, 2, 2, 1, 2);
+
+        msgEdit = new QLineEdit(centralWidget);
+        msgEdit->setObjectName(QStringLiteral("msgEdit"));
+
+        gridLayout->addWidget(msgEdit, 2, 1, 1, 1);
 
 
         gridLayout_2->addLayout(gridLayout, 0, 0, 1, 1);
