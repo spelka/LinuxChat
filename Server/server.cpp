@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------------
--- SOURCE FILE:		server.cpp 		An application that reads, processes, and echoes data out 
+-- SOURCE FILE:		server.cpp 		An application that reads, processes, and echoes data out
 --									to clients.
 --
 -- PROGRAM:			Linux Chat
@@ -29,28 +29,29 @@ int max_array_index = -1;
 int clients[FD_SETSIZE];
 struct sockaddr_in client_address;
 fd_set copy_filedescriptors;		//holds a copy of the master set
+vector<string>userList;
 
 /*--------------------------------------------------------------------------------------------
 -- FUNCTION:	main
 --
 -- DATE:		March 20, 2015
 --
--- REVISIONS:	
+-- REVISIONS:
 --
 -- DESIGNER: 	Sebastian Pelka
--- 
+--
 -- PROGRAMMER:	Sebastian Pelka
 --
 -- INTERFACE:	int main ()
 --
 -- RETURNS:		returns 1 if the function fails, 0 if succesful
--- 
+--
 -- NOTES:		the main entry point the LinuxChat program. Initializes the listening socket.
 ----------------------------------------------------------------------------------------------*/
 int main ()
 {
 	struct sockaddr_in listen_address;
-	
+
 	//start server
 	//create a stream socket
 	listen_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -81,7 +82,7 @@ int main ()
 	//bind the socket to accept connections from any ip address
 	retval = bind( listen_socket, ( struct sockaddr* ) &listen_address, sizeof( listen_address ) );
 	if ( retval == -1 )
-	{	
+	{
 		//bind failed
 		std::cout << "ERROR: Failed to bind socket" << std::endl;
 		return 1;
@@ -102,7 +103,7 @@ int main ()
 
 	processConnections();
 
-	
+
 	return 0;
 }
 
@@ -111,10 +112,10 @@ int main ()
 --
 -- DATE:		March 20, 2015
 --
--- REVISIONS:	
+-- REVISIONS:
 --
 -- DESIGNER: 	Sebastian Pelka
--- 
+--
 -- PROGRAMMER:	Sebastian Pelka
 --
 -- INTERFACE:	int processConnections()
@@ -126,7 +127,7 @@ int main ()
 ----------------------------------------------------------------------------------------------*/
 int processConnections()
 {
-	
+
 	//go into a forever loop
 	for (;;)
 	{
@@ -135,7 +136,7 @@ int processConnections()
 
 		//call select to monitor multiple file descriptors
 		num_ready_descriptors = select ( ( max_filedescriptors + 1 ), &copy_filedescriptors, NULL, NULL, NULL );
-		
+
 		if ( num_ready_descriptors == -1 )
 		{
 			//select failure
@@ -145,7 +146,7 @@ int processConnections()
 
 		listenNewConnections();
 
-		checkForData();		
+		checkForData();
 	}
 	return 0;
 }
@@ -155,10 +156,10 @@ int processConnections()
 --
 -- DATE:		March 20, 2015
 --
--- REVISIONS:	 
+-- REVISIONS:
 --
 -- DESIGNER: 	Sebastian Pelka
--- 
+--
 -- PROGRAMMER:	Sebastian Pelka
 --
 -- INTERFACE:	void listenNewConnections()
@@ -188,7 +189,7 @@ void listenNewConnections()
 			//failed to accept socket
 			std::cout << "ERROR: accept call failed" << std::endl;
 		}
-		
+
 		//message
 		std::cout << "New socket accepted. Client address: " << inet_ntoa(client_address.sin_addr) << std::endl;
 
@@ -240,10 +241,10 @@ void listenNewConnections()
 --
 -- DATE:		March 20, 2015
 --
--- REVISIONS:	 
+-- REVISIONS:
 --
 -- DESIGNER: 	Sebastian Pelka
--- 
+--
 -- PROGRAMMER:	Sebastian Pelka
 --
 -- INTERFACE:	void listenNewConnections()
@@ -281,7 +282,7 @@ void checkForData()
 
 			//read data in
 		    bytes_read = read ( sockFd, byte_pointer, bytes_to_read );
-			
+
 			if (bytes_read == 0)
 			{
 				std::cout << "Remote Address: " << inet_ntoa(client_address.sin_addr) << " closed connection" << std::endl;
@@ -319,15 +320,27 @@ void checkForData()
 			memset(read_buffer, 0, sizeof(read_buffer));
 
 			if (--num_ready_descriptors <= 0)
-        			break;  
+        			break;
 		}
 	}
 }
 
 /*--------------------------------------------------------------------------------------------
+-- FUNCTION:	processUsrName
 --
+-- DATE:		March 20, 2015
 --
+-- REVISIONS:
 --
+-- DESIGNER: Filip Gutica
+--
+-- PROGRAMMER:	Filip Gutica
+--
+-- INTERFACE:	int processUsrName(char* s)
+--
+-- RETURNS:		void
+--
+-- NOTES:		tokenizes a message by user name to update the user list
 --
 ----------------------------------------------------------------------------------------------*/
 int processUsrName(char* s)
@@ -360,6 +373,6 @@ int processUsrName(char* s)
 			}
 		}
 	}
-	
+
 	return 0;
 }
