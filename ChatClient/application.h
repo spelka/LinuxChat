@@ -43,6 +43,8 @@ private slots:
     void on_btnSend_clicked();
     void onReturnPressed();
 
+    void on_action_save_convo_triggered();
+
 private:
     Ui::Application *ui;
     QVector<QString> usrList;

@@ -30,6 +30,8 @@
 *********************************************************************************************************/
 #include "application.h"
 #include "ui_application.h"
+#include <QFile>
+#include <QDateTime>
 
 /*******************************************************************************************************
 ** Function: 	Application
@@ -344,4 +346,40 @@ void Application::onReturnPressed()
     SendMessage(text.toUtf8().constData(), size);
 
     ui->msgEdit->clear();
+}
+
+/*******************************************************************************************************
+** Function: 	on_action_save_convo_triggered()
+**
+** DATE:		March 25, 2015
+**
+** DESIGNER:	Auto Generated
+**
+** PROGRAMMER:	Filip Gutica A00781910
+**
+** INTERFACE:	on_action_save_convo_triggered()
+**
+** RETURNS:
+**      void
+**
+** NOTES:
+** SLOT function. Catches when the user selects the "Save Conversation" menu item.
+** Creates a new file, writes out the conversation.
+**
+******************************************************************************************************/
+void Application::on_action_save_convo_triggered()
+{
+    QDateTime local(QDateTime::currentDateTime());
+    QString fname;
+    fname = QString("Conversation: %1").arg(local.toString());
+
+    qDebug() << fname;
+
+    QFile file(fname);
+
+    if (file.open(QIODevice::ReadWrite))
+    {
+        QString conversation = ui->txtConvo->toPlainText();
+        file.write(conversation.toUtf8().constData(), conversation.size());
+    }
 }

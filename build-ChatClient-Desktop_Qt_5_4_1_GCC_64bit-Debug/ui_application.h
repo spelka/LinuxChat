@@ -32,6 +32,7 @@ class Ui_Application
 {
 public:
     QAction *actionConnect_to_server;
+    QAction *action_save_convo;
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
     QGridLayout *gridLayout;
@@ -54,6 +55,8 @@ public:
 "color: white;"));
         actionConnect_to_server = new QAction(Application);
         actionConnect_to_server->setObjectName(QStringLiteral("actionConnect_to_server"));
+        action_save_convo = new QAction(Application);
+        action_save_convo->setObjectName(QStringLiteral("action_save_convo"));
         centralWidget = new QWidget(Application);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_2 = new QGridLayout(centralWidget);
@@ -120,6 +123,8 @@ public:
         Application->setStatusBar(statusBar);
 
         mainToolBar->addAction(actionConnect_to_server);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(action_save_convo);
 
         retranslateUi(Application);
 
@@ -130,6 +135,7 @@ public:
     {
         Application->setWindowTitle(QApplication::translate("Application", "Application", 0));
         actionConnect_to_server->setText(QApplication::translate("Application", "Connect to server", 0));
+        action_save_convo->setText(QApplication::translate("Application", "Save Conversation", 0));
         label->setText(QApplication::translate("Application", "Users:", 0));
         label_2->setText(QApplication::translate("Application", "Conversation:", 0));
         btnSend->setText(QApplication::translate("Application", "Send", 0));
