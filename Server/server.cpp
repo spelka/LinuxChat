@@ -20,7 +20,7 @@
 --
 ----------------------------------------------------------------------------------------------*/
 
-#include "serverFunc.h"
+#include "server.h"
 int listen_socket;
 fd_set master_filedescriptors;		//the master set of file descriptors
 int max_filedescriptors;			//the number of file descriptors used
