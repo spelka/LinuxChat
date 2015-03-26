@@ -86,7 +86,7 @@ void ConnectToServer(int port, char *ip, void *app)
     qDebug() << "Connected: Server Name: " << hostPtr->h_name;
 
     strInfo = QString("Connected to chatroom server: %1")
-            .arg(inet_ntop(hostPtr->h_addrtype, pptr, serverAddress, sizeof(serverAddress)));
+            .arg(hostPtr->h_name);
     mainWindow->appendMessage(strInfo);
 
     pthread_create (&threadRead, NULL, readThrd, (void*)1);
