@@ -1,3 +1,17 @@
+/*****************************************************************************************************
+**	SOURCE FILE:	application.h 			header file for application.cpp
+**
+**	PROGRAM:	ChatClient
+
+**
+**	DATE: 		March 25, 2015
+**
+**
+**	DESIGNER: 	Filip Gutica A00781910
+**
+**	PROGRAMMER: Filip Gutica A00781910
+**
+*********************************************************************************************************/
 #ifndef APPLICATION_H
 #define APPLICATION_H
 

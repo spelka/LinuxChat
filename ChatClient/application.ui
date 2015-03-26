@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Application</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #424242;
+color: white;</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
@@ -37,7 +41,8 @@
         </property>
         <property name="styleSheet">
          <string notr="true">border-radius: 10px;
-background: white;</string>
+background: #BDBDBD;
+color: black;</string>
         </property>
        </widget>
       </item>
@@ -45,7 +50,8 @@ background: white;</string>
        <widget class="QTextBrowser" name="txtConvo">
         <property name="styleSheet">
          <string notr="true">border-radius: 10px;
-background: white;</string>
+background: #BDBDBD;
+color: black;</string>
         </property>
        </widget>
       </item>

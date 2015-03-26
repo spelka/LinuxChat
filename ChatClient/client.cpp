@@ -1,3 +1,23 @@
+/*****************************************************************************************************
+**	SOURCE FILE:	client.cpp 			File for client network operations.
+**
+**	PROGRAM:	ChatClient
+**
+**	FUNCTIONS:
+**		void ConnectToServer(int, char*, void*)
+**		void* readThrd(void*)
+**		void SendMessage(const char*, int)
+**      void CloseConnection()
+**
+**
+**	DATE: 		March 25, 2015
+**
+**
+**	DESIGNER: 	Filip Gutica A00781910
+**
+**	PROGRAMMER: Filip Gutica A00781910
+**
+*********************************************************************************************************/
 #include "client.h"
 #include "ui_application.h"
 #include "application.h"
@@ -6,6 +26,24 @@ Application *mainWindow;
 
 int clientSocket;
 
+/*******************************************************************************************************
+** Function: 	ConnectToServer(int, char*, void*)
+**
+** DATE:		March 25, 2015
+**
+** DESIGNER:	Filip Gutica A00781910
+**
+** PROGRAMMER:	Filip Gutica A00781910
+**
+** INTERFACE:	ConnectToServer(int, char*, void*)
+**
+** RETURNS:
+**      void
+**
+** NOTES:
+** Connects to the server using the provided port and ip address. Starts thread to facilitate
+** reading on the socket.
+******************************************************************************************************/
 void ConnectToServer(int port, char *ip, void *app)
 {
     QString strInfo;
@@ -56,6 +94,23 @@ void ConnectToServer(int port, char *ip, void *app)
 
 }
 
+/*******************************************************************************************************
+** Function: 	readThrd(void*)
+**
+** DATE:		March 25, 2015
+**
+** DESIGNER:	Filip Gutica A00781910
+**
+** PROGRAMMER:	Filip Gutica A00781910
+**
+** INTERFACE:	readThrd(void*)
+**
+** RETURNS:
+**      void*
+**
+** NOTES:
+** PThread function that handles reading on the socket.
+******************************************************************************************************/
 void* readThrd(void *param)
 {
     char *bp, buf[BUFFSIZE];
@@ -105,11 +160,45 @@ void* readThrd(void *param)
     }
 }
 
+/*******************************************************************************************************
+** Function: 	SendMessage(const char*, int)
+**
+** DATE:		March 25, 2015
+**
+** DESIGNER:	Filip Gutica A00781910
+**
+** PROGRAMMER:	Filip Gutica A00781910
+**
+** INTERFACE:	SendMessage(const char*, int)
+**
+** RETURNS:
+**      void
+**
+** NOTES:
+** Sends a message on the socket
+******************************************************************************************************/
 void SendMessage(const char* msg, int size)
 {
     send (clientSocket, msg, size, 0);
 }
 
+/*******************************************************************************************************
+** Function: 	CloseConnection()
+**
+** DATE:		March 25, 2015
+**
+** DESIGNER:	Filip Gutica A00781910
+**
+** PROGRAMMER:	Filip Gutica A00781910
+**
+** INTERFACE:	CloseConnection()
+**
+** RETURNS:
+**      void
+**
+** NOTES:
+** Closes the socket
+******************************************************************************************************/
 void CloseConnection()
 {
     close(clientSocket);

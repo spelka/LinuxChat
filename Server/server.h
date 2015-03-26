@@ -1,3 +1,23 @@
+/*--------------------------------------------------------------------------------------------
+-- SOURCE FILE:		server.g 		header file for server.cpp
+--
+-- PROGRAM:			Linux Chat
+--
+-- FUNCTIONS:
+--					int main()
+--
+-- DATE:			March 20, 2015
+--
+-- REVISIONS:
+--
+-- DESIGNER:		Sebastian Pelka
+--
+-- PROGRAMMER:		Sebastian Pelka
+--
+-- NOTES:
+-- Contains libraries and function definitions for our server.
+--
+----------------------------------------------------------------------------------------------*/
 #ifndef SERVERFUNC_H
 #define SERVERFUNC_H
 

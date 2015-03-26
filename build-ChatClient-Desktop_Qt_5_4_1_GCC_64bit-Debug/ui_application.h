@@ -50,6 +50,8 @@ public:
         if (Application->objectName().isEmpty())
             Application->setObjectName(QStringLiteral("Application"));
         Application->resize(845, 472);
+        Application->setStyleSheet(QLatin1String("background-color: #424242;\n"
+"color: white;"));
         actionConnect_to_server = new QAction(Application);
         actionConnect_to_server->setObjectName(QStringLiteral("actionConnect_to_server"));
         centralWidget = new QWidget(Application);
@@ -71,14 +73,16 @@ public:
         listUsers->setObjectName(QStringLiteral("listUsers"));
         listUsers->setMaximumSize(QSize(175, 16777215));
         listUsers->setStyleSheet(QLatin1String("border-radius: 10px;\n"
-"background: white;"));
+"background: #BDBDBD;\n"
+"color: black;"));
 
         gridLayout->addWidget(listUsers, 1, 0, 1, 1);
 
         txtConvo = new QTextBrowser(centralWidget);
         txtConvo->setObjectName(QStringLiteral("txtConvo"));
         txtConvo->setStyleSheet(QLatin1String("border-radius: 10px;\n"
-"background: white;"));
+"background: #BDBDBD;\n"
+"color: black;"));
 
         gridLayout->addWidget(txtConvo, 1, 1, 1, 3);
 
