@@ -1,3 +1,17 @@
+/*****************************************************************************************************
+**	SOURCE FILE:	client.h 			header file for client.cpp
+**
+**	PROGRAM:	ChatClient
+
+**
+**	DATE: 		March 25, 2015
+**
+**
+**	DESIGNER: 	Filip Gutica A00781910
+**
+**	PROGRAMMER: Filip Gutica A00781910
+**
+*********************************************************************************************************/
 #ifndef CLIENT
 #define CLIENT
 

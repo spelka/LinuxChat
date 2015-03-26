@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Application</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: #424242;
+color: white;</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
@@ -37,7 +41,8 @@
         </property>
         <property name="styleSheet">
          <string notr="true">border-radius: 10px;
-background: white;</string>
+background: #BDBDBD;
+color: black;</string>
         </property>
        </widget>
       </item>
@@ -45,7 +50,8 @@ background: white;</string>
        <widget class="QTextBrowser" name="txtConvo">
         <property name="styleSheet">
          <string notr="true">border-radius: 10px;
-background: white;</string>
+background: #BDBDBD;
+color: black;</string>
         </property>
        </widget>
       </item>
@@ -101,11 +107,18 @@ background: white;</string>
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnect_to_server"/>
+   <addaction name="separator"/>
+   <addaction name="action_save_convo"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionConnect_to_server">
    <property name="text">
     <string>Connect to server</string>
+   </property>
+  </action>
+  <action name="action_save_convo">
+   <property name="text">
+    <string>Save Conversation</string>
    </property>
   </action>
  </widget>

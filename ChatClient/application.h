@@ -1,3 +1,17 @@
+/*****************************************************************************************************
+**	SOURCE FILE:	application.h 			header file for application.cpp
+**
+**	PROGRAM:	ChatClient
+
+**
+**	DATE: 		March 25, 2015
+**
+**
+**	DESIGNER: 	Filip Gutica A00781910
+**
+**	PROGRAMMER: Filip Gutica A00781910
+**
+*********************************************************************************************************/
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
@@ -28,6 +42,8 @@ private slots:
     void removeFromList(QString);
     void on_btnSend_clicked();
     void onReturnPressed();
+
+    void on_action_save_convo_triggered();
 
 private:
     Ui::Application *ui;

@@ -32,6 +32,7 @@ class Ui_Application
 {
 public:
     QAction *actionConnect_to_server;
+    QAction *action_save_convo;
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
     QGridLayout *gridLayout;
@@ -50,8 +51,12 @@ public:
         if (Application->objectName().isEmpty())
             Application->setObjectName(QStringLiteral("Application"));
         Application->resize(845, 472);
+        Application->setStyleSheet(QLatin1String("background-color: #424242;\n"
+"color: white;"));
         actionConnect_to_server = new QAction(Application);
         actionConnect_to_server->setObjectName(QStringLiteral("actionConnect_to_server"));
+        action_save_convo = new QAction(Application);
+        action_save_convo->setObjectName(QStringLiteral("action_save_convo"));
         centralWidget = new QWidget(Application);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout_2 = new QGridLayout(centralWidget);
@@ -71,14 +76,16 @@ public:
         listUsers->setObjectName(QStringLiteral("listUsers"));
         listUsers->setMaximumSize(QSize(175, 16777215));
         listUsers->setStyleSheet(QLatin1String("border-radius: 10px;\n"
-"background: white;"));
+"background: #BDBDBD;\n"
+"color: black;"));
 
         gridLayout->addWidget(listUsers, 1, 0, 1, 1);
 
         txtConvo = new QTextBrowser(centralWidget);
         txtConvo->setObjectName(QStringLiteral("txtConvo"));
         txtConvo->setStyleSheet(QLatin1String("border-radius: 10px;\n"
-"background: white;"));
+"background: #BDBDBD;\n"
+"color: black;"));
 
         gridLayout->addWidget(txtConvo, 1, 1, 1, 3);
 
@@ -116,6 +123,8 @@ public:
         Application->setStatusBar(statusBar);
 
         mainToolBar->addAction(actionConnect_to_server);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(action_save_convo);
 
         retranslateUi(Application);
 
@@ -126,6 +135,7 @@ public:
     {
         Application->setWindowTitle(QApplication::translate("Application", "Application", 0));
         actionConnect_to_server->setText(QApplication::translate("Application", "Connect to server", 0));
+        action_save_convo->setText(QApplication::translate("Application", "Save Conversation", 0));
         label->setText(QApplication::translate("Application", "Users:", 0));
         label_2->setText(QApplication::translate("Application", "Conversation:", 0));
         btnSend->setText(QApplication::translate("Application", "Send", 0));

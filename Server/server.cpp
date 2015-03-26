@@ -14,6 +14,7 @@
 -- DESIGNER:		Sebastian Pelka
 --
 -- PROGRAMMER:		Sebastian Pelka
+--					Filip Gutica
 --
 -- NOTES:
 -- based on code found at www.milliways.bcit.ca/c4981, by Aman Abdulla
@@ -21,15 +22,16 @@
 ----------------------------------------------------------------------------------------------*/
 
 #include "server.h"
+
 int listen_socket;
-fd_set master_filedescriptors;		//the master set of file descriptors
 int max_filedescriptors;			//the number of file descriptors used
 int num_ready_descriptors;
 int max_array_index = -1;
 int clients[FD_SETSIZE];
-struct sockaddr_in client_address;
+fd_set master_filedescriptors;		//the master set of file descriptors
 fd_set copy_filedescriptors;		//holds a copy of the master set
-vector<string>userList;
+vector<string> userList;
+
 
 /*--------------------------------------------------------------------------------------------
 -- FUNCTION:	main
@@ -174,6 +176,7 @@ void listenNewConnections()
 {
 	int client_socket;
 	unsigned int client_address_size;
+	struct sockaddr_in client_address;
 
 	//variables dealing with reading and echoing
 	int i = 0;
@@ -200,7 +203,6 @@ void listenNewConnections()
 			{
 				//save the descriptor
 				clients[i] = client_socket;
-				//std::cout << "New client saved. Socket number: " << clients[i] << std::endl;
 				break;
 			}
 		}
@@ -217,21 +219,19 @@ void listenNewConnections()
 		{
 			//update max_filedescriptors
 			max_filedescriptors = client_socket;
-			//std::cout << "new max filedescriptors value: " << max_filedescriptors << std::endl;
+			
 		}
 
 		if ( i > max_array_index )
 		{
 			//update max index in array
 			max_array_index = i;
-			//std::cout << "new max array index: " << max_array_index << std::endl;
 		}
 
 
 		if ( --num_ready_descriptors <= 0 )
 		{
 			//no more descriptors ready
-			//std::cout << "no more descriptors available" << std::endl;
 		}
 	}
 }
@@ -263,6 +263,8 @@ void checkForData()
 	int bytes_to_read;
 	int bytes_read;
 	char read_buffer[BUFFER_LENGTH];
+	memset(read_buffer, 0, sizeof(read_buffer));
+
 	//check for any new data
 	for ( int i = 0 ; i <= max_array_index ; i++ )
 	{
@@ -285,7 +287,6 @@ void checkForData()
 
 			if (bytes_read == 0)
 			{
-				std::cout << "Remote Address: " << inet_ntoa(client_address.sin_addr) << " closed connection" << std::endl;
 				close(sockFd);
 				FD_CLR(sockFd, &master_filedescriptors);
 				clients[i] = -1;
@@ -305,7 +306,6 @@ void checkForData()
 			}
 
 			command = processUsrName(read_buffer);
-
 			if (command == SEND_LIST)
 			{
 				for (int j = 0; j < userList.size(); j++)
@@ -332,7 +332,7 @@ void checkForData()
 --
 -- REVISIONS:
 --
--- DESIGNER: Filip Gutica
+-- DESIGNER: 	Filip Gutica
 --
 -- PROGRAMMER:	Filip Gutica
 --
@@ -359,14 +359,14 @@ int processUsrName(char* s)
 
 		cout << "Adding to vector: " << usr << endl;
 
-		return SEND_LIST;
+		return SEND_LIST;	
 	}
 	else if (strcmp(tok, "remove") == 0)
 	{
 		tok = strtok(NULL, ":");
 		for ( int j = 0; j < userList.size(); j++ )
 		{
-			if (strcmp(userList.at(j).c_str(), tok) == 0)
+			if (strcmp(userList[j].c_str(), tok) == 0)
 			{
 				cout << "Removing user: " << tok << endl;
 				userList.erase(userList.begin() + j);
